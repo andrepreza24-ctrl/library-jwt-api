@@ -1,0 +1,59 @@
+services:
+  app:
+    build: .
+    container_name: library_jwt_app
+    restart: unless-stopped
+    working_dir: /var/www
+    entrypoint: ["bash", "/entrypoint.sh"]
+    volumes:
+      - ./src:/var/www
+      - ./overlay:/overlay:ro
+      - ./entrypoint.sh:/entrypoint.sh:ro
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=db
+      - DB_DATABASE=library
+      - DB_USERNAME=laravel
+      - DB_PASSWORD=laravel
+    depends_on:
+      - db
+    networks:
+      - library
+
+  db:
+    image: mysql:8.0
+    container_name: library_jwt_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: library
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: laravel
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - library
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: library_jwt_phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+    networks:
+      - library
+
+networks:
+  library:
+
+volumes:
+  db_data:
