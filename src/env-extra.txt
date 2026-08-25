@@ -1,0 +1,4 @@
+
+# ======= Auth JWT: variables agregadas =======
+JWT_SECRET=
+JWT_TTL=60
